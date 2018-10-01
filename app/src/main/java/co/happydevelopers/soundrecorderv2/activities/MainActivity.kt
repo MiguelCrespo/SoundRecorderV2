@@ -6,15 +6,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import co.happydevelopers.soundrecorderv2.R
-import co.happydevelopers.soundrecorderv2.RecordTabFragment
+import fragments.RecordTabFragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), RecordTabFragment.OnFragmentInteractionListener {
-    override fun onFragmentInteraction(uri: Uri) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     private var mMainPagerAdapter : MainPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
