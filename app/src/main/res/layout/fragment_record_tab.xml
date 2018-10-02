@@ -26,6 +26,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Chronometer
+        android:id="@+id/chronometer_record_fragment_chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
@@ -37,6 +38,7 @@
         app:layout_constraintTop_toTopOf="@+id/progressBar" />
 
     <TextView
+        android:id="@+id/textView_record_fragment_bottom_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

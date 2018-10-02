@@ -2,21 +2,28 @@ package fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import co.happydevelopers.soundrecorderv2.R
+import kotlinx.android.synthetic.main.fragment_record_tab.*
 import kotlinx.android.synthetic.main.fragment_record_tab.view.*
+import services.RecordService
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -30,6 +37,7 @@ import java.io.IOException
  */
 class RecordTabFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
+    private var isRecording = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,33 +63,40 @@ class RecordTabFragment : Fragment() {
     }
 
     private fun startRecording() {
-        // Just testing what happens if I start to record an audio in the fragment and without permission
-        val fileName = Environment.getExternalStorageDirectory().absolutePath + "/ElMigue" + "Test"
+        if (!isRecording) {
+            chronometer_record_fragment_chronometer.base = SystemClock.elapsedRealtime()
+            chronometer_record_fragment_chronometer.start()
 
-        val mediaRecorder = MediaRecorder()
-        mediaRecorder.setAudioChannels(1)
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        mediaRecorder.setOutputFile(fileName)
+            textView_record_fragment_bottom_status.text = "Recording..."
 
-        try {
-            mediaRecorder.prepare()
-            mediaRecorder.start()
+            button_record_fragment_record.text = "Stop"
 
-        } catch (e: IOException) {
-            Log.e("ERROR", "prepare() failed")
+            val intent = Intent(activity, RecordService::class.java)
+
+            activity?.startService(intent)
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        } else {
+            chronometer_record_fragment_chronometer.stop()
+
+            // Why is this line needed?
+            chronometer_record_fragment_chronometer.base = SystemClock.elapsedRealtime()
+            textView_record_fragment_bottom_status.text = "Tap the button to start recording"
+
+            button_record_fragment_record.text = "Record"
         }
+
+        isRecording = !isRecording
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-       if(requestCode == AUDIO_PERMISSION_GRANTED){
-           if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED ) {
-               startRecording()
-           } else {
-               Toast.makeText(context, "Please grant permission to start recording", Toast.LENGTH_SHORT).show()
-           }
-       }
+        if (requestCode == AUDIO_PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                startRecording()
+            } else {
+                Toast.makeText(context, "Please grant permission to start recording", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
