@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import co.happydevelopers.soundrecorderv2.R
@@ -39,7 +40,7 @@ class RecordTabFragment : Fragment() {
         val v = inflater.inflate(R.layout.fragment_record_tab, container, false)
 
         v.button_record_fragment_record.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 startRecording()
             } else {
                 requestAudioPermission()
@@ -50,7 +51,7 @@ class RecordTabFragment : Fragment() {
     }
 
     private fun requestAudioPermission() {
-        requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), AUDIO_PERMISSION_GRANTED)
+        requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE), AUDIO_PERMISSION_GRANTED)
     }
 
     private fun startRecording() {
@@ -65,19 +66,20 @@ class RecordTabFragment : Fragment() {
         mediaRecorder.setOutputFile(fileName)
 
         try {
-            mediaRecorder.prepare();
-            mediaRecorder.start();
+            mediaRecorder.prepare()
+            mediaRecorder.start()
 
         } catch (e: IOException) {
-            Log.e("ERROR", "prepare() failed");
+            Log.e("ERROR", "prepare() failed")
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
        if(requestCode == AUDIO_PERMISSION_GRANTED){
-           if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-               // Start recording
+           if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED ) {
+               startRecording()
+           } else {
+               Toast.makeText(context, "Please grant permission to start recording", Toast.LENGTH_SHORT).show()
            }
        }
     }
@@ -111,7 +113,8 @@ class RecordTabFragment : Fragment() {
     }
 
     companion object {
-        val AUDIO_PERMISSION_GRANTED = 1
+        const val AUDIO_PERMISSION_GRANTED = 1
+        val LOG_TAG = RecordTabFragment::class.java.simpleName
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
