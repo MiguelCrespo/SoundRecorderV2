@@ -1,13 +1,18 @@
 package fragments
 
 import android.content.Context
+import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import co.happydevelopers.soundrecorderv2.R
+import kotlinx.android.synthetic.main.fragment_record_tab.view.*
+import java.io.IOException
 
 
 /**
@@ -28,8 +33,34 @@ class RecordTabFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_record_tab, container, false)
+        val v = inflater.inflate(R.layout.fragment_record_tab, container, false)
+
+        v.button_record_fragment_record.setOnClickListener {
+            startRecording()
+        }
+
+        return v
+    }
+
+    private fun startRecording() {
+        // Just testing what happens if I start to record an audio in the fragment and without permission
+        val fileName = Environment.getExternalStorageDirectory().absolutePath + "/ElMigue" + "Test"
+
+        val mediaRecorder = MediaRecorder()
+        mediaRecorder.setAudioChannels(1)
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+        mediaRecorder.setOutputFile(fileName)
+
+        try {
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+
+        } catch (e: IOException) {
+            Log.e("ERROR", "prepare() failed");
+        }
+
     }
 
     override fun onAttach(context: Context) {
