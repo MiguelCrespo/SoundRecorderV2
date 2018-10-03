@@ -1,5 +1,6 @@
 package fragments
 
+import adapters.AudioListAdapter
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import co.happydevelopers.soundrecorderv2.R
 import kotlinx.android.synthetic.main.fragment_saved_records.view.*
@@ -25,9 +27,8 @@ import java.io.File
  */
 class SavedRecordsFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
     private var listener: OnFragmentInteractionListener? = null
+    private val mSoundList = arrayListOf<File>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +41,22 @@ class SavedRecordsFragment : Fragment() {
 
         readFiles()
 
-        //v.linearLayout_saved_records_empty_state_container.visibility = View.GONE
+        if (mSoundList.size > 0) {
+            v.linearLayout_saved_records_empty_state_container.visibility = View.GONE
+
+            v.recyclerView_saved_records_audio_list.layoutManager = LinearLayoutManager(activity)
+            v.recyclerView_saved_records_audio_list.adapter = AudioListAdapter(mSoundList)
+        }
+
         return v
     }
 
     private fun readFiles() {
         File(AUDIO_PATH).walk().forEach {
-            Log.d(LOG_TAG, it.name)
+            val file = File(it.absolutePath)
+            if (file.isFile) {
+                mSoundList.add(file)
+            }
         }
     }
 
