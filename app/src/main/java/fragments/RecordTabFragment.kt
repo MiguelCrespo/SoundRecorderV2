@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.SystemClock
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -63,6 +60,8 @@ class RecordTabFragment : Fragment() {
     }
 
     private fun startRecording() {
+        val intent = Intent(activity, RecordService::class.java)
+
         if (!isRecording) {
             chronometer_record_fragment_chronometer.base = SystemClock.elapsedRealtime()
             chronometer_record_fragment_chronometer.start()
@@ -70,8 +69,6 @@ class RecordTabFragment : Fragment() {
             textView_record_fragment_bottom_status.text = "Recording..."
 
             button_record_fragment_record.text = "Stop"
-
-            val intent = Intent(activity, RecordService::class.java)
 
             activity?.startService(intent)
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -84,6 +81,9 @@ class RecordTabFragment : Fragment() {
             textView_record_fragment_bottom_status.text = "Tap the button to start recording"
 
             button_record_fragment_record.text = "Record"
+
+            activity?.stopService(intent)
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
         isRecording = !isRecording

@@ -7,6 +7,7 @@ import android.os.Environment
 import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_record_tab.*
 import java.io.File
 import java.io.IOException
@@ -22,6 +23,7 @@ import java.util.*
 class RecordService : Service() {
     private val mediaRecorder: MediaRecorder = MediaRecorder()
     private var file: File? = null
+    private var fileName: String? = ""
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -41,20 +43,16 @@ class RecordService : Service() {
 
     private fun startRecording() {
         // Just testing what happens if I start to record an audio in the fragment and without permission
+        if (isExternalStorageWritable()) {
+            val mainDir = File(Environment.getExternalStorageDirectory().absolutePath + "/com.happydevelopers.soundRecorderV2/")
 
-        //File(Environment.getExternalStorageDirectory().absolutePath + "/soundrecorderv2/")
-        if(isExternalStorageWritable()){
+            if (!mainDir.exists()) {
+                mainDir.mkdir()
+            }
 
-            //val something  = Environment.getExternalStoragePublicDirectory()
+            fileName = Environment.getExternalStorageDirectory().absolutePath + "/com.happydevelopers.soundRecorderV2/" + generateFileName() + ".mp4"
 
-            val fileName = generateFileName() + ".mp4"
-
-            file = File(Environment.getExternalStorageDirectory().absolutePath + "/elmigue/", fileName)
-
-            //file.createNewFile()
-
-
-            Log.d(LOG_TAG, "Saving file to " + fileName)
+            file = File(fileName)
 
             mediaRecorder.setAudioChannels(1)
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -69,20 +67,17 @@ class RecordService : Service() {
             } catch (e: IOException) {
                 Log.e("ERROR", "prepare() failed")
             }
-        }else{
+        } else {
             Log.d(LOG_TAG, "There is a problem with the MEDIA")
         }
-
-
     }
 
     private fun stopRecording() {
         mediaRecorder.stop()
         mediaRecorder.release()
 
-        /*file?.let {
-            file?.delete()
-        }*/
+        Toast.makeText(applicationContext, "File saved in $fileName", Toast.LENGTH_LONG).show()
+        fileName = ""
     }
 
     /* Checks if external storage is available for read and write */
@@ -99,7 +94,7 @@ class RecordService : Service() {
     private fun generateFileName(): String {
         val today = Calendar.getInstance()
 
-        return "sound_record" + SimpleDateFormat("d_M_Y", Locale.US).format(today.time)
+        return "record_" + SimpleDateFormat("d_M_Y", Locale.US).format(today.time) + '_' + SimpleDateFormat("HH_mm_ss", Locale.US).format(today.time)
     }
 
     companion object {
