@@ -20,7 +20,7 @@ import java.util.*
  * Created by miguelcrespo on 10/3/18.
  */
 
-class AudioListAdapter(private val mFiles: ArrayList<File>) : RecyclerView.Adapter<CustomViewHolder>() {
+class AudioListAdapter(var mFiles: ArrayList<File>) : RecyclerView.Adapter<CustomViewHolder>() {
     override fun getItemCount(): Int {
         return mFiles.size
     }

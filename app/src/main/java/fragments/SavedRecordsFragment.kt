@@ -27,8 +27,9 @@ import java.io.File
  */
 class SavedRecordsFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var listener: OnFragmentInteractionListener? = null
+    private var listener: OnSavedRecordsFragmentInteractionListener? = null
     private val mSoundList = arrayListOf<File>()
+    private var mRecyclerViewAdapter: AudioListAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -41,28 +42,40 @@ class SavedRecordsFragment : Fragment() {
             v.linearLayout_saved_records_empty_state_container.visibility = View.GONE
 
             v.recyclerView_saved_records_audio_list.layoutManager = LinearLayoutManager(activity)
-            v.recyclerView_saved_records_audio_list.adapter = AudioListAdapter(mSoundList)
+            mRecyclerViewAdapter = AudioListAdapter(mSoundList)
+            v.recyclerView_saved_records_audio_list.adapter = mRecyclerViewAdapter
         }
 
         return v
     }
 
     private fun readFiles() {
+        Log.d(LOG_TAG, "readFiles $AUDIO_PATH")
         File(AUDIO_PATH).walk().forEach {
-            val file = File(it.absolutePath)
-            if (file.isFile) {
-                mSoundList.add(file)
+            if (it.isFile) {
+                mSoundList.add(it)
             }
         }
     }
 
+    fun refreshList() {
+        Log.d(LOG_TAG, "Refreshing list...")
+        mSoundList.clear()
+
+        readFiles()
+
+        mRecyclerViewAdapter?.mFiles = mSoundList
+
+        mRecyclerViewAdapter?.notifyDataSetChanged()
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        /*if (context is OnFragmentInteractionListener) {
+        if (context is OnSavedRecordsFragmentInteractionListener) {
             listener = context
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }*/
+        }
     }
 
     override fun onDetach() {
@@ -81,9 +94,8 @@ class SavedRecordsFragment : Fragment() {
      * (http://developer.android.com/training/basics/fragments/communicating.html)
      * for more information.
      */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+    interface OnSavedRecordsFragmentInteractionListener {
+
     }
 
     companion object {

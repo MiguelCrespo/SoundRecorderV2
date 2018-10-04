@@ -33,7 +33,7 @@ import java.util.*
  *
  */
 class RecordTabFragment : Fragment() {
-    private var listener: OnFragmentInteractionListener? = null
+    private var listener: OnRecordTabFragmentInteractionListener? = null
     private var isRecording = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -80,6 +80,8 @@ class RecordTabFragment : Fragment() {
 
             activity?.stopService(intent)
             activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            listener?.onAudioRecorded()
         }
 
         isRecording = !isRecording
@@ -97,7 +99,7 @@ class RecordTabFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
+        if (context is OnRecordTabFragmentInteractionListener) {
             listener = context
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
@@ -120,7 +122,8 @@ class RecordTabFragment : Fragment() {
      * (http://developer.android.com/training/basics/fragments/communicating.html)
      * for more information.
      */
-    interface OnFragmentInteractionListener {
+    interface OnRecordTabFragmentInteractionListener {
+        fun onAudioRecorded()
     }
 
     companion object {

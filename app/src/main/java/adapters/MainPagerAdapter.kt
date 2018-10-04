@@ -6,12 +6,12 @@ import androidx.fragment.app.FragmentPagerAdapter
 import fragments.RecordTabFragment
 import fragments.SavedRecordsFragment
 
-class MainPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class MainPagerAdapter(fm: FragmentManager, private val savedRecordsFragment: SavedRecordsFragment) : FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment {
 
         return when(position) {
             0 -> RecordTabFragment.newInstance()
-            1 -> SavedRecordsFragment.newInstance()
+            1 -> savedRecordsFragment
             else -> RecordTabFragment.newInstance()
         }
     }
