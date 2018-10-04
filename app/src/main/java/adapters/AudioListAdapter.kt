@@ -1,5 +1,6 @@
 package adapters
 
+import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,18 +32,42 @@ class AudioListAdapter(private val mFiles: ArrayList<File>) : RecyclerView.Adapt
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
         val file = mFiles[position]
-        val fileInputStream = FileInputStream(file)
 
-        val prop = Properties()
+        val mmr = MediaMetadataRetriever()
 
-        prop.load(fileInputStream)
+        mmr.setDataSource(file.absolutePath)
+
+        val durationText = formatToHumanReadableDuration(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
 
 
         holder.itemView.textView_item_saved_records_title.text = file.name
-        holder.itemView.textView_item_saved_records_duration.text = prop.getProperty("Created")
+        holder.itemView.textView_item_saved_records_duration.text = durationText
+        holder.itemView.textView_item_saved_records_date.text = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
+    }
 
-        fileInputStream.close()
+    private fun formatToHumanReadableDuration(durationMs: String) : String {
+        val seconds = durationMs.toDouble() / 1000
+        var formatted = ""
 
+        val hours = Math.floor(seconds / 3600)
+        val minutes = Math.floor(seconds % 3600 / 60)
+        val scs = Math.floor(seconds % 3600 % 60)
+
+        if(hours > 0) {
+            formatted += ("0${hours.toInt()}").takeLast(2)+ ":"
+        }
+
+        if (minutes > 0 || hours > 0) {
+            formatted += ("0${minutes.toInt()}").takeLast(2)+ ":"
+        }
+
+        if (minutes == 0.0 && hours == 0.0) {
+            formatted += "00:"
+        }
+
+        formatted += ("0${scs.toInt()}").takeLast(2)
+
+        return formatted
     }
 }
 

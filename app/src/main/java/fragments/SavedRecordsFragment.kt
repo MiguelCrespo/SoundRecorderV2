@@ -30,10 +30,6 @@ class SavedRecordsFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
     private val mSoundList = arrayListOf<File>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.fragment_saved_records, container, false)

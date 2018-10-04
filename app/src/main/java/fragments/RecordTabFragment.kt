@@ -36,10 +36,6 @@ class RecordTabFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
     private var isRecording = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.fragment_record_tab, container, false)
