@@ -11,8 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 import co.happydevelopers.soundrecorderv2.R
+import kotlinx.android.synthetic.main.fragment_saved_records.*
 import kotlinx.android.synthetic.main.fragment_saved_records.view.*
 import java.io.File
 
@@ -44,6 +46,13 @@ class SavedRecordsFragment : Fragment() {
             v.recyclerView_saved_records_audio_list.layoutManager = LinearLayoutManager(activity)
             mRecyclerViewAdapter = AudioListAdapter(mSoundList)
             v.recyclerView_saved_records_audio_list.adapter = mRecyclerViewAdapter
+        }
+
+        v.swipeRefresh_saved_records_refresh.setOnRefreshListener {
+            Log.d(LOG_TAG, "OnRefreshListener")
+            refreshList()
+            // Signal SwipeRefreshLayout to start the progress indicator
+            v.swipeRefresh_saved_records_refresh.isRefreshing = false
         }
 
         return v
