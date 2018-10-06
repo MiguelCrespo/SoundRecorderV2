@@ -64,9 +64,11 @@ class SavedRecordsFragment : Fragment() {
 
         readFiles()
 
-        mRecyclerViewAdapter?.mFiles = mSoundList
+        if (mRecyclerViewAdapter != null) {
+            mRecyclerViewAdapter?.setFiles(mSoundList)
 
-        mRecyclerViewAdapter?.notifyDataSetChanged()
+            mRecyclerViewAdapter?.notifyDataSetChanged()
+        }
     }
 
     override fun onAttach(context: Context) {

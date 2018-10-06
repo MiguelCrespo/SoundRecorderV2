@@ -10,19 +10,25 @@ import co.happydevelopers.soundrecorderv2.R
 import kotlinx.android.synthetic.main.view_item_saved_records.view.*
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
  * Created by miguelcrespo on 10/3/18.
  */
 
-class AudioListAdapter(var mFiles: ArrayList<File>) : RecyclerView.Adapter<CustomViewHolder>() {
+class AudioListAdapter(private var mFiles: ArrayList<File>) : RecyclerView.Adapter<CustomViewHolder>() {
     override fun getItemCount(): Int {
         return mFiles.size
+    }
+
+    fun setFiles(files: ArrayList<File>) {
+        this.mFiles = files
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
@@ -39,19 +45,26 @@ class AudioListAdapter(var mFiles: ArrayList<File>) : RecyclerView.Adapter<Custo
 
         val mmr = MediaMetadataRetriever()
 
-        mmr.setDataSource(file.absolutePath)
-
-        val durationText = formatToHumanReadableDuration(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
-
-        val df = SimpleDateFormat("yyyyMMdd'T'HHmmss'.'SSS'Z'", Locale.getDefault())
-        df.timeZone = TimeZone.getTimeZone("UTC")
-        val tdf = SimpleDateFormat("dd/MM/yyyy, hh:mm a", Locale.getDefault())
-
-        val date = df.parse(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE))
-
         holder.itemView.textView_item_saved_records_title.text = file.name
-        holder.itemView.textView_item_saved_records_duration.text = durationText
-        holder.itemView.textView_item_saved_records_date.text = tdf.format(date)
+
+        try {
+            mmr.setDataSource(file.absolutePath)
+
+            val durationText = formatToHumanReadableDuration(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
+
+            val df = SimpleDateFormat("yyyyMMdd'T'HHmmss'.'SSS'Z'", Locale.getDefault())
+            df.timeZone = TimeZone.getTimeZone("UTC")
+            val tdf = SimpleDateFormat("dd/MM/yyyy, hh:mm a", Locale.getDefault())
+
+            val date = df.parse(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE))
+
+            holder.itemView.textView_item_saved_records_duration.text = durationText
+            holder.itemView.textView_item_saved_records_date.text = tdf.format(date)
+
+            mmr.release()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, e.toString())
+        }
     }
 
     private fun formatToHumanReadableDuration(durationMs: String): String {
@@ -77,6 +90,10 @@ class AudioListAdapter(var mFiles: ArrayList<File>) : RecyclerView.Adapter<Custo
         formatted += ("0${scs.toInt()}").takeLast(2)
 
         return formatted
+    }
+
+    companion object {
+        val LOG_TAG = AudioListAdapter::class.java.simpleName
     }
 }
 

@@ -3,6 +3,7 @@ package co.happydevelopers.soundrecorderv2.activities
 import adapters.MainPagerAdapter
 import android.net.Uri
 import android.os.Bundle
+import android.os.FileObserver
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -13,10 +14,20 @@ import fragments.SavedRecordsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), RecordTabFragment.OnRecordTabFragmentInteractionListener, SavedRecordsFragment.OnSavedRecordsFragmentInteractionListener {
-    override fun onAudioRecorded() {
-        Log.d(LOG_TAG, "onAudioRecorded")
+    override fun onAudioRecorded(fileName: String) {
+        Log.d(LOG_TAG, "onAudioRecorded fileName: $fileName")
 
-        savedRecordsFragment.refreshList()
+        val observer = object : FileObserver(fileName) {
+            override fun onEvent(event: Int, path: String?) {
+                Log.d(LOG_TAG, "EVENT: $event")
+                Log.d(LOG_TAG, "Refreshing list")
+                runOnUiThread { savedRecordsFragment.refreshList() }
+                this.stopWatching()
+            }
+        }
+
+        observer.startWatching()
+
     }
 
     private var mMainPagerAdapter : MainPagerAdapter? = null
@@ -43,6 +54,6 @@ class MainActivity : AppCompatActivity(), RecordTabFragment.OnRecordTabFragmentI
     }
 
     companion object {
-        val LOG_TAG = MainActivity::class.java.simpleName
+        val LOG_TAG: String = MainActivity::class.java.simpleName
     }
 }

@@ -3,6 +3,7 @@ package services
 import android.app.Service
 import android.content.Intent
 import android.media.MediaRecorder
+import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
 import android.os.SystemClock
@@ -23,10 +24,17 @@ import java.util.*
 class RecordService : Service() {
     private val mediaRecorder: MediaRecorder = MediaRecorder()
     private var file: File? = null
-    private var fileName: String? = ""
+    var fileName: String? = ""
+    private var mBinder = LocalBinder()
+
+    inner class LocalBinder : Binder() {
+        fun getService(): RecordService {
+            return this@RecordService
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null
+        return mBinder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -38,7 +46,10 @@ class RecordService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
+        Log.d(LOG_TAG, "onDestroy")
         stopRecording()
+
+
     }
 
     private fun startRecording() {
@@ -51,8 +62,6 @@ class RecordService : Service() {
             }
 
             fileName = Environment.getExternalStorageDirectory().absolutePath + "/com.happydevelopers.soundRecorderV2/" + generateFileName() + ".mp4"
-
-            file = File(fileName)
 
             mediaRecorder.setAudioChannels(1)
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -72,9 +81,11 @@ class RecordService : Service() {
         }
     }
 
-    private fun stopRecording() {
+    fun stopRecording() {
+        Log.d(LOG_TAG, "stopRecording")
         mediaRecorder.stop()
         mediaRecorder.release()
+
 
         Toast.makeText(applicationContext, "File saved in $fileName", Toast.LENGTH_LONG).show()
         fileName = ""
