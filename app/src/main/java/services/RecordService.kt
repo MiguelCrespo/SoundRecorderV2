@@ -23,7 +23,6 @@ import java.util.*
 
 class RecordService : Service() {
     private val mediaRecorder: MediaRecorder = MediaRecorder()
-    private var file: File? = null
     var fileName: String? = ""
     private var mBinder = LocalBinder()
 
@@ -48,8 +47,6 @@ class RecordService : Service() {
 
         Log.d(LOG_TAG, "onDestroy")
         stopRecording()
-
-
     }
 
     private fun startRecording() {
@@ -61,13 +58,17 @@ class RecordService : Service() {
                 mainDir.mkdir()
             }
 
-            fileName = Environment.getExternalStorageDirectory().absolutePath + "/com.happydevelopers.soundRecorderV2/" + generateFileName() + ".mp4"
+            fileName = Environment.getExternalStorageDirectory().absolutePath + "/com.happydevelopers.soundRecorderV2/" + generateFileName() + ".mp3"
 
             mediaRecorder.setAudioChannels(1)
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC)
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             mediaRecorder.setOutputFile(fileName)
+
+            // High quality
+            mediaRecorder.setAudioSamplingRate(44100)
+            mediaRecorder.setAudioEncodingBitRate(192000)
 
             try {
                 mediaRecorder.prepare()
@@ -105,7 +106,7 @@ class RecordService : Service() {
     private fun generateFileName(): String {
         val today = Calendar.getInstance()
 
-        return "record_" + SimpleDateFormat("d_M_Y", Locale.US).format(today.time) + '_' + SimpleDateFormat("HH_mm_ss", Locale.US).format(today.time)
+        return "record_" + SimpleDateFormat("d_M_y", Locale.US).format(today.time) + '_' + SimpleDateFormat("HH_mm_ss", Locale.US).format(today.time)
     }
 
     companion object {

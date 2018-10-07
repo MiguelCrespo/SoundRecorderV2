@@ -33,11 +33,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="26dp"
-                android:text="You haven't record any audio yet :/"
+                android:text="You haven't recorded any audio yet :/"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/button_saved_records_start_recording"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start recording" />

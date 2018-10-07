@@ -2,6 +2,7 @@ package adapters
 
 import android.media.MediaMetadataRetriever
 import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,7 @@ class AudioListAdapter(private var mFiles: ArrayList<File>) : RecyclerView.Adapt
         val mmr = MediaMetadataRetriever()
 
         holder.itemView.textView_item_saved_records_title.text = file.name
+        holder.itemView.id = position
 
         try {
             mmr.setDataSource(file.absolutePath)
@@ -97,6 +99,14 @@ class AudioListAdapter(private var mFiles: ArrayList<File>) : RecyclerView.Adapt
     }
 }
 
-class CustomViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+class CustomViewHolder(v: View) : RecyclerView.ViewHolder(v), View.OnCreateContextMenuListener {
+    init {
+        v.setOnCreateContextMenuListener(this@CustomViewHolder)
+    }
 
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        menu?.setHeaderTitle("Select an option")
+        menu?.add(0, v!!.id, 0, "Share")
+        menu?.add(1, v!!.id, 0, "Delete")
+    }
 }
